@@ -264,4 +264,6 @@ if __name__ == "__main__":
     print(f"  Students : {list(label_map.values())}")
     print("  Open     : http://localhost:5000")
     print("=" * 50)
-    app.run(debug=True)
+import os
+port = int(os.environ.get("PORT", 10000))
+app.run(host="0.0.0.0", port=port)
