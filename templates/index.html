@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Face Recognition Attendance System</title>
+
+  <!-- Google Fonts: Space Mono + DM Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+  <!-- ░░░░ SCANLINE OVERLAY ░░░░ -->
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- ░░░░ HEADER ░░░░ -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <span class="bi bi-cpu"></span>
+          <div class="logo-pulse"></div>
+        </div>
+        <div class="logo-text">
+          <h1 class="app-title">AI Face Recognition</h1>
+          <p class="app-subtitle">Attendance Management System</p>
+        </div>
+      </div>
+
+      <div class="header-stats">
+        <div class="stat-chip" id="chip-total">
+          <span class="bi bi-people"></span>
+          <span id="stat-total-label">0</span>
+          <small>Students</small>
+        </div>
+        <div class="stat-chip accent" id="chip-today">
+          <span class="bi bi-check-circle"></span>
+          <span id="stat-today-label">0</span>
+          <small>Present Today</small>
+        </div>
+        <div class="stat-chip" id="chip-time">
+          <span class="bi bi-clock"></span>
+          <span id="live-clock">--:--</span>
+          <small id="live-date">-- --- ----</small>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ░░░░ MAIN GRID ░░░░ -->
+  <main class="main-grid">
+
+    <!-- ────── LEFT PANEL ────── -->
+    <aside class="panel panel-left">
+
+      <!-- Student Roster -->
+      <section class="card roster-card">
+        <div class="card-header">
+          <span class="bi bi-person-badge"></span>
+          <h2>Student Roster</h2>
+          <button class="icon-btn reload-btn" onclick="reloadFaces()" title="Reload faces">
+            <span class="bi bi-arrow-clockwise"></span>
+          </button>
+        </div>
+        <ul class="roster-list" id="roster-list">
+          {% for student in students %}
+          <li class="roster-item" id="roster-{{ student | lower }}">
+            <div class="avatar">{{ student[0] }}</div>
+            <div class="roster-info">
+              <span class="roster-name">{{ student }}</span>
+              <span class="roster-status absent" id="status-{{ student | lower }}">Absent</span>
+            </div>
+            <div class="roster-dot absent" id="dot-{{ student | lower }}"></div>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <!-- Quick Actions -->
+      <section class="card actions-card">
+        <div class="card-header">
+          <span class="bi bi-lightning-charge"></span>
+          <h2>Quick Actions</h2>
+        </div>
+        <div class="actions-grid">
+          <button class="btn btn-upload" onclick="document.getElementById('file-input').click()">
+            <span class="bi bi-upload"></span>
+            <span>Upload Photo</span>
+          </button>
+          <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleUpload(event)" />
+
+          <button class="btn btn-camera" id="btn-camera" onclick="toggleCamera()">
+            <span class="bi bi-camera-video"></span>
+            <span>Start Camera</span>
+          </button>
+
+          <button class="btn btn-reset" onclick="confirmReset()">
+            <span class="bi bi-trash3"></span>
+            <span>Reset Records</span>
+          </button>
+
+          <button class="btn btn-reload" onclick="refreshAttendance()">
+            <span class="bi bi-arrow-repeat"></span>
+            <span>Refresh Table</span>
+          </button>
+        </div>
+      </section>
+    </aside>
+
+    <!-- ────── CENTRE PANEL ────── -->
+    <section class="panel panel-centre">
+
+      <!-- Recognition Viewport -->
+      <div class="card viewport-card">
+        <div class="card-header">
+          <span class="bi bi-camera"></span>
+          <h2>Recognition Viewport</h2>
+          <div class="rec-indicator" id="rec-indicator">
+            <span class="rec-dot"></span>
+            <span id="rec-label">IDLE</span>
+          </div>
+        </div>
+
+        <div class="viewport-wrap" id="viewport-wrap">
+          <!-- Default idle screen -->
+          <div class="viewport-idle" id="viewport-idle">
+            <div class="idle-icon">
+              <span class="bi bi-person-bounding-box"></span>
+            </div>
+            <p class="idle-text">Upload a photo or start the camera<br/>to begin face recognition</p>
+            <div class="idle-bars">
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+          </div>
+
+          <!-- Upload result image -->
+          <img id="upload-result-img" class="result-img hidden" alt="Recognition result" />
+
+          <!-- Camera live feed -->
+          <div id="camera-feed-wrap" class="hidden">
+            <img id="camera-feed" src="/video_feed" alt="Live camera feed" />
+            <div class="feed-overlay">
+              <div class="corner tl"></div>
+              <div class="corner tr"></div>
+              <div class="corner bl"></div>
+              <div class="corner br"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toast notifications -->
+      <div id="toast-container"></div>
+
+    </section>
+
+    <!-- ────── RIGHT PANEL ────── -->
+    <aside class="panel panel-right">
+
+      <!-- Attendance Log -->
+      <section class="card attendance-card">
+        <div class="card-header">
+          <span class="bi bi-journal-check"></span>
+          <h2>Attendance Log</h2>
+          <span class="record-count" id="record-count">0 records</span>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <span class="bi bi-search"></span>
+            <input type="text" id="search-input" placeholder="Search student..." oninput="filterTable()" />
+          </div>
+          <select id="filter-date" onchange="filterTable()">
+            <option value="">All Dates</option>
+          </select>
+        </div>
+
+        <!-- Table -->
+        <div class="table-scroll">
+          <table class="attendance-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Time</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="attendance-tbody">
+              <tr class="empty-row">
+                <td colspan="4">
+                  <span class="bi bi-inbox"></span>
+                  No records yet
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Export -->
+        <div class="export-bar">
+          <a href="/attendance.csv" download class="btn-export">
+            <span class="bi bi-download"></span> Export CSV
+          </a>
+          <span id="export-note">attendance.csv</span>
+        </div>
+      </section>
+    </aside>
+
+  </main>
+
+  <!-- ░░░░ RESET CONFIRM MODAL ░░░░ -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-icon"><span class="bi bi-exclamation-triangle"></span></div>
+      <h3>Reset Attendance?</h3>
+      <p>All attendance records will be permanently deleted. This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-modal-confirm" onclick="doReset()">Yes, Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
