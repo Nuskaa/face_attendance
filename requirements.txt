@@ -1,5 +1,5 @@
 flask
-opencv-python-headless
-numpy
-pandas
 gunicorn
+numpy
+opencv-python-headless
+opencv-contrib-python==4.10.0.84
