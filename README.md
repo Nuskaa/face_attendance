@@ -1,10 +1,10 @@
-# 🎓 AI Face Recognition Attendance System
+#  AI Face Recognition Attendance System
 
 A modern, full-stack student attendance system using Python, Flask, and face recognition — designed as a polished college project demonstration.
 
 ---
 
-## ✨ Features
+##  Features
 
 | Feature | Description |
 |---|---|
@@ -17,7 +17,7 @@ A modern, full-stack student attendance system using Python, Flask, and face rec
 
 ---
 
-## 🗂️ Project Structure
+##  Project Structure
 
 ```
 face_attendance_app/
@@ -44,7 +44,7 @@ face_attendance_app/
 
 ---
 
-## 🚀 Setup & Run
+##  Setup & Run
 
 ### Step 1 — Prerequisites
 
@@ -98,7 +98,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-> ⚠️ `dlib` (a dependency of `face_recognition`) compiles from source and may take **2–5 minutes**.  
+>  `dlib` (a dependency of `face_recognition`) compiles from source and may take **2–5 minutes**.  
 > On Windows you may need Microsoft Visual C++ Build Tools.
 
 ---
@@ -161,7 +161,7 @@ Navigate to: **http://localhost:5000**
 
 ---
 
-## 🖥️ How to Use
+##  How to Use
 
 ### Upload a Photo
 1. Click **"Upload Photo"** in the Quick Actions panel
@@ -190,7 +190,7 @@ Navigate to: **http://localhost:5000**
 
 ---
 
-## ⚙️ Configuration
+##  Configuration
 
 | Setting | Location | Default |
 |---|---|---|
@@ -201,7 +201,7 @@ Navigate to: **http://localhost:5000**
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 **`dlib` fails to install**  
 → Install CMake and C++ build tools (see Step 1)  
@@ -221,7 +221,7 @@ Navigate to: **http://localhost:5000**
 
 ---
 
-## 📦 Dependencies
+##  Dependencies
 
 ```
 flask          — Web framework
@@ -234,7 +234,7 @@ Pillow         — Image generation for placeholders
 
 ---
 
-## 📝 Notes
+##  Notes
 
 - Each student is marked **Present only once per day** (duplicates are prevented)
 - Attendance is saved in `attendance.csv` in the format: `Name | Time | Date | Status`
@@ -243,4 +243,4 @@ Pillow         — Image generation for placeholders
 
 ---
 
-*Built with ❤️ for college project demonstration*
+
