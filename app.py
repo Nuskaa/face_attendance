@@ -42,9 +42,16 @@ def manifest():
         "theme_color": "#00d4ff",
         "orientation": "portrait-primary",
         "scope": "/",
+        "id": "/",
         "icons": [
+            {"src": "/static/icons/icon-72.png",  "sizes": "72x72",   "type": "image/png", "purpose": "maskable any"},
+            {"src": "/static/icons/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "maskable any"},
+            {"src": "/static/icons/icon-128.png", "sizes": "128x128", "type": "image/png", "purpose": "maskable any"},
             {"src": "/static/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable any"},
             {"src": "/static/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable any"}
+        ],
+        "screenshots": [
+            {"src": "/static/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "form_factor": "narrow"}
         ],
         "categories": ["education", "utilities"]
     }
