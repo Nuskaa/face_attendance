@@ -145,6 +145,10 @@ def get_attendance():
     return jsonify({"records": records, "today_count": today_count, "total": len(records)})
 
 
+@app.route('/static/manifest.json')
+def manifest():
+    return app.send_static_file('manifest.json')
+
 @app.route('/api/reset_attendance', methods=['POST'])
 def reset_attendance():
     with open("attendance.csv", "w") as f:
